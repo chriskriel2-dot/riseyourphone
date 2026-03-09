@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RISE — Your phone is stealing your life.</title>
+  <meta name="description" content="Compete with friends to see who can use their phone the least. The social screen time killer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green: #00AA44; --white: #FFFFFF; --grey: #888888; --dark-grey: #222222; --bg: #000000; }
+    html, body { background: var(--bg); color: var(--white); font-family: 'Space Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px); pointer-events: none; z-index: 100; }
+
+    .container { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+
+    header { padding: 32px 0; animation: fadeIn 0.4s ease forwards; }
+    .logo { font-size: 12px; font-weight: 700; letter-spacing: 0.25em; color: var(--green); }
+
+    .hero { padding: 72px 0 56px; }
+    .prompt-line { font-size: 12px; color: var(--green); margin-bottom: 32px; opacity: 0; animation: fadeIn 0.5s ease forwards; animation-delay: 0.3s; }
+    .prompt-line span { color: var(--grey); }
+
+    .headline { font-size: clamp(38px, 9vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 32px; min-height: 3.3em; }
+    #line1, #line2 { display: block; color: var(--white); }
+    #line3 { display: block; color: var(--green); }
+
+    .type-cursor { display: inline-block; width: 0.5ch; height: 0.88em; background: var(--white); margin-left: 2px; vertical-align: text-bottom; animation: blink 0.7s step-end infinite; }
+    .type-cursor.green { background: var(--green); }
+
+    .tagline-wrap { font-size: 11px; color: var(--grey); letter-spacing: 0.22em; text-transform: uppercase; min-height: 1.4em; opacity: 0; transition: opacity 0.3s; }
+    .tagline-wrap.show { opacity: 1; }
+    #tagline-cursor { display: none; }
+    #tagline-cursor.show { display: inline-block; width: 6px; height: 11px; background: var(--green); margin-left: 3px; vertical-align: middle; animation: blink 1s step-end infinite; }
+
+    .cta-block, .how-section, .pro-section, footer { opacity: 0; pointer-events: none; }
+    .cta-block.show { animation: fadeUp 1.8s cubic-bezier(0.16,1,0.3,1) forwards; pointer-events: all; }
+    .how-section.show { animation: fadeUp 1.8s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.2s; pointer-events: all; }
+    .pro-section.show { animation: fadeUp 1.8s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.4s; pointer-events: all; }
+    footer.show { animation: fadeUp 1.8s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay: 0.6s; pointer-events: all; }
+
+    .cta-block { padding: 48px 0; border-top: 1px solid var(--dark-grey); }
+    .app-store-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--white); color: var(--bg); padding: 18px 28px; text-decoration: none; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; transition: all 0.2s ease; margin-bottom: 10px; width: 100%; max-width: 380px; }
+    .app-store-btn:hover { background: var(--green); color: var(--white); }
+    .app-store-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .free-note { font-size: 11px; color: var(--grey); letter-spacing: 0.06em; margin-bottom: 36px; }
+
+    .form-label { font-size: 11px; color: var(--grey); letter-spacing: 0.08em; margin-bottom: 10px; display: block; }
+    .form-label .arrow { color: var(--green); }
+    .email-row { display: flex; max-width: 400px; }
+    .email-input { flex: 1; background: transparent; border: 1px solid var(--dark-grey); border-right: none; color: var(--white); font-family: 'Space Mono', monospace; font-size: 12px; padding: 13px 14px; outline: none; transition: border-color 0.2s; min-width: 0; }
+    .email-input::placeholder { color: #444; }
+    .email-input:focus { border-color: var(--green); }
+    .email-btn { background: var(--green); color: var(--white); border: none; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 13px 16px; cursor: pointer; letter-spacing: 0.08em; transition: background 0.2s; white-space: nowrap; flex-shrink: 0; }
+    .email-btn:hover { background: #00cc55; }
+    .email-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-note { font-size: 10px; color: #444; margin-top: 8px; letter-spacing: 0.04em; }
+    .success-msg { display: none; font-size: 12px; color: var(--green); padding: 10px 0; letter-spacing: 0.04em; }
+    .success-msg.show { display: block; }
+    .error-msg { display: none; font-size: 12px; color: #ff4444; padding: 10px 0; letter-spacing: 0.04em; }
+    .error-msg.show { display: block; }
+
+    .how-section { padding: 48px 0; border-top: 1px solid var(--dark-grey); }
+    .section-label { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--green); margin-bottom: 28px; }
+    .steps { list-style: none; }
+    .steps li { display: flex; gap: 20px; padding: 16px 0; border-top: 1px solid var(--dark-grey); }
+    .steps li:last-child { border-bottom: 1px solid var(--dark-grey); }
+    .step-num { color: var(--green); font-weight: 700; font-size: 11px; flex-shrink: 0; padding-top: 2px; min-width: 20px; }
+    .step-body strong { display: block; font-size: 13px; color: var(--white); margin-bottom: 3px; }
+    .step-body p { font-size: 12px; color: var(--grey); line-height: 1.6; }
+
+    .pro-section { padding: 48px 0; border-top: 1px solid var(--dark-grey); }
+    .pro-badge { display: inline-block; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); border: 1px solid var(--green); padding: 4px 10px; margin-bottom: 20px; }
+    .pro-desc { font-size: 13px; color: var(--grey); line-height: 1.7; margin-bottom: 28px; max-width: 460px; }
+
+    footer { padding: 36px 0; border-top: 1px solid var(--dark-grey); }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-copy { font-size: 10px; color: #444; letter-spacing: 0.04em; }
+    .footer-links { display: flex; gap: 20px; list-style: none; }
+    .footer-links a { font-size: 10px; color: #444; text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--green); }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    @media (max-width: 480px) {
+      .hero { padding: 56px 0 40px; }
+      .cta-block, .how-section, .pro-section { padding: 40px 0; }
+      .email-row { flex-direction: column; }
+      .email-input { border-right: 1px solid var(--dark-grey); border-bottom: none; }
+      .app-store-btn { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="logo">RISE</div>
+    </header>
+
+    <section class="hero">
+      <div class="prompt-line"><span>~/life $</span> open --app rise</div>
+      <h1 class="headline">
+        <span id="line1"></span>
+        <span id="line2"></span>
+        <span id="line3"></span><span class="type-cursor" id="tcursor"></span>
+      </h1>
+      <div class="tagline-wrap" id="tagline-wrap">
+        <span id="tagline-text"></span><span id="tagline-cursor"></span>
+      </div>
+    </section>
+
+    <section class="cta-block" id="cta">
+      <a href="https://apps.apple.com/app/id6759870151" class="app-store-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download for iOS — Free
+      </a>
+      <p class="free-note">> Free forever. No subscription. No catch.</p>
+
+      <div>
+        <label class="form-label"><span class="arrow">> </span>On Android? Get notified when we launch.</label>
+        <div class="email-row" id="androidRow">
+          <input type="email" class="email-input" id="androidEmail" placeholder="your@email.com" autocomplete="email" />
+          <button class="email-btn" id="androidBtn" onclick="submitEmail('android')">NOTIFY ME</button>
+        </div>
+        <p class="success-msg" id="androidSuccess">> You're on the list. We'll reach out when Android drops.</p>
+        <p class="error-msg" id="androidError">> Something went wrong. Please try again.</p>
+        <p class="form-note">No spam. One email when Android launches.</p>
+      </div>
+    </section>
+
+    <section class="how-section" id="how">
+      <p class="section-label">> how it works</p>
+      <ul class="steps">
+        <li><span class="step-num">01</span><div class="step-body"><strong>Sign in with Apple</strong><p>One tap. No passwords. No friction.</p></div></li>
+        <li><span class="step-num">02</span><div class="step-body"><strong>Create or join a group</strong><p>Share a code with your friends. Now you're all watching each other.</p></div></li>
+        <li><span class="step-num">03</span><div class="step-body"><strong>Compete daily</strong><p>Least screen time wins. Live leaderboard. Real accountability.</p></div></li>
+        <li><span class="step-num">04</span><div class="step-body"><strong>Watch your usage drop</strong><p>Willpower alone fails. Your friends watching you doesn't.</p></div></li>
+      </ul>
+    </section>
+
+    <section class="pro-section" id="pro">
+      <span class="pro-badge">Coming Soon</span>
+      <p class="pro-desc">RISE Pro uses device-level restrictions that can't be bypassed, deleted, or worked around. For people who are serious about taking their life back.</p>
+      <div>
+        <label class="form-label"><span class="arrow">> </span>Get early access to RISE Pro.</label>
+        <div class="email-row" id="proRow">
+          <input type="email" class="email-input" id="proEmail" placeholder="your@email.com" autocomplete="email" />
+          <button class="email-btn" id="proBtn" onclick="submitEmail('pro')">JOIN WAITLIST</button>
+        </div>
+        <p class="success-msg" id="proSuccess">> You're on the waitlist. We'll be in touch.</p>
+        <p class="error-msg" id="proError">> Something went wrong. Please try again.</p>
+        <p class="form-note">Launching later this year.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer id="foot">
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-copy">© 2026 RISE. All rights reserved.</p>
+        <ul class="footer-links">
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/cdn-cgi/l/email-protection#157d7c55677c66706c7a6067657d7a7b703b767a78">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    const HEADLINE_MS = 65;
+    const TAGLINE_MS  = 55;
+
+
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function typeInto(el, text, ms) {
+      for (const ch of text) {
+        el.textContent += ch;
+        await sleep(ms);
+      }
+    }
+
+    async function runSequence() {
+      const tcursor       = document.getElementById('tcursor');
+      const line1         = document.getElementById('line1');
+      const line2         = document.getElementById('line2');
+      const line3         = document.getElementById('line3');
+      const taglineWrap   = document.getElementById('tagline-wrap');
+      const taglineText   = document.getElementById('tagline-text');
+      const taglineCursor = document.getElementById('tagline-cursor');
+
+      await sleep(700);
+      await typeInto(line1, 'Your phone', HEADLINE_MS);
+      await sleep(200);
+      await typeInto(line2, 'is stealing', HEADLINE_MS);
+      await sleep(200);
+      tcursor.classList.add('green');
+      await typeInto(line3, 'your life.', HEADLINE_MS);
+      await sleep(600);
+      tcursor.style.display = 'none';
+
+      taglineWrap.classList.add('show');
+      taglineCursor.classList.add('show');
+      await sleep(200);
+      await typeInto(taglineText, 'YOUR FRIENDS ARE WATCHING', TAGLINE_MS);
+      await sleep(900);
+      taglineCursor.style.display = 'none';
+
+      await sleep(300);
+      ['cta','how','pro','foot'].forEach(id => {
+        document.getElementById(id).classList.add('show');
+      });
+    }
+
+    runSequence();
+
+    async function submitEmail(type) {
+      const emailId   = type === 'android' ? 'androidEmail'   : 'proEmail';
+      const rowId     = type === 'android' ? 'androidRow'     : 'proRow';
+      const successId = type === 'android' ? 'androidSuccess' : 'proSuccess';
+      const errorId   = type === 'android' ? 'androidError'   : 'proError';
+      const btnId     = type === 'android' ? 'androidBtn'     : 'proBtn';
+      const tag       = type === 'android' ? 'android'        : 'rise-pro';
+
+      const email = document.getElementById(emailId).value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById(emailId).style.borderColor = '#ff4444';
+        document.getElementById(emailId).focus();
+        return;
+      }
+
+      const btn = document.getElementById(btnId);
+      btn.textContent = '...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(
+          `https://api.beehiiv.com/v2/publications/${BEEHIIV_PUB}/subscriptions`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${BEEHIIV_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email,
+              tags: [tag],
+              reactivate_existing: true,
+              send_welcome_email: true
+            })
+          }
+        );
+
+        if (res.ok) {
+          document.getElementById(rowId).style.display = 'none';
+          document.getElementById(successId).classList.add('show');
+        } else {
+          throw new Error('API error');
+        }
+      } catch (e) {
+        btn.textContent = type === 'android' ? 'NOTIFY ME' : 'J
