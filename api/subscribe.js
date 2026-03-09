@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -12,32 +11,45 @@ export default async function handler(req, res) {
 
   const BEEHIIV_KEY = process.env.BEEHIIV_API_KEY;
   const BEEHIIV_PUB = process.env.BEEHIIV_PUB_ID;
+  const BASE = `https://api.beehiiv.com/v2/publications/${BEEHIIV_PUB}`;
+  const HEADERS = {
+    'Authorization': `Bearer ${BEEHIIV_KEY}`,
+    'Content-Type': 'application/json'
+  };
 
   try {
-    const response = await fetch(
-      `https://api.beehiiv.com/v2/publications/${BEEHIIV_PUB}/subscriptions`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${BEEHIIV_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          tags: [tag],
-          reactivate_existing: true,
-          send_welcome_email: true
-        })
-      }
-    );
+    // Step 1: Create or reactivate subscription
+    const subRes = await fetch(`${BASE}/subscriptions`, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,
+        send_welcome_email: true,
+        double_opt_override: 'off'
+      })
+    });
 
-    if (response.ok) {
-      return res.status(200).json({ success: true });
-    } else {
-      const error = await response.text();
-      console.error('Beehiiv error:', error);
+    if (!subRes.ok) {
+      const err = await subRes.text();
+      console.error('Subscription error:', err);
       return res.status(500).json({ error: 'Subscription failed' });
     }
+
+    const subData = await subRes.json();
+    const subscriptionId = subData?.data?.id;
+
+    // Step 2: Assign tag if we have a subscription ID and a tag
+    if (subscriptionId && tag) {
+      await fetch(`${BASE}/subscriptions/${subscriptionId}/tags`, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({ tags: [tag] })
+      });
+    }
+
+    return res.status(200).json({ success: true });
+
   } catch (err) {
     console.error('Server error:', err);
     return res.status(500).json({ error: 'Server error' });
