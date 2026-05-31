@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RISE — Your phone is stealing your life.</title>
-  <meta name="description" content="Compete with friends to see who can use their phone the least. The social screen time killer." />
+  <title>RISE — Your phone is stealing your life. Or is it?</title>
+  <meta name="description" content="Block your apps. Read a real book. Earn your screen time back. Become the smartest person in the room." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -116,11 +116,14 @@
     <section class="how-section" id="how">
       <p class="section-label">> how it works</p>
       <ul class="steps">
-        <li><span class="step-num">01</span><div class="step-body"><strong>Sign in with Apple</strong><p>One tap. No passwords. No friction.</p></div></li>
-        <li><span class="step-num">02</span><div class="step-body"><strong>Create or join a group</strong><p>Share a code with your friends. Now you're all watching each other.</p></div></li>
-        <li><span class="step-num">03</span><div class="step-body"><strong>Compete daily</strong><p>Least screen time wins. Live leaderboard. Real accountability.</p></div></li>
-        <li><span class="step-num">04</span><div class="step-body"><strong>Watch your usage drop</strong><p>Willpower alone fails. Your friends watching you doesn't.</p></div></li>
+        <li><span class="step-num">01</span><div class="step-body"><strong>Download the app</strong><p>Sign in with Apple. One tap. No passwords.</p></div></li>
+        <li><span class="step-num">02</span><div class="step-body"><strong>Block the apps that own you</strong><p>Pick the ones stealing your hours. Instagram, TikTok, whatever it is. RISE locks them down.</p></div></li>
+        <li><span class="step-num">03</span><div class="step-body"><strong>Pick up a real, physical book</strong><p>The kind made of paper. Yes, they still exist.</p></div></li>
+        <li><span class="step-num">04</span><div class="step-body"><strong>Tell RISE which chapter you just read</strong><p>It generates a quiz on the spot. No faking it.</p></div></li>
+        <li><span class="step-num">05</span><div class="step-body"><strong>Pass the quiz</strong><p>Prove you actually read it. RISE doesn't take your word for it.</p></div></li>
+        <li><span class="step-num">06</span><div class="step-body"><strong>Unlock 15 minutes of screen time</strong><p>Use it in chunks throughout the day. Want more? Read more.</p></div></li>
       </ul>
+      <p class="pro-desc" style="margin-top: 28px;">RISE keeps a library of every book you've read and tracks your progress over time. The more you read, the more your screen time drops on its own. You become the smartest person in the room without trying.</p>
     </section>
     <section class="pro-section" id="pro">
       <span class="pro-badge">Coming Soon</span>
@@ -176,16 +179,16 @@
       await sleep(700);
       await typeInto(line1, 'Your phone', HEADLINE_MS);
       await sleep(200);
-      await typeInto(line2, 'is stealing', HEADLINE_MS);
+      await typeInto(line2, 'is stealing your life.', HEADLINE_MS);
       await sleep(200);
       tcursor.classList.add('green');
-      await typeInto(line3, 'your life.', HEADLINE_MS);
+      await typeInto(line3, 'Or is it?', HEADLINE_MS);
       await sleep(600);
       tcursor.style.display = 'none';
       taglineWrap.classList.add('show');
       taglineCursor.classList.add('show');
       await sleep(200);
-      await typeInto(taglineText, 'YOUR FRIENDS ARE WATCHING', TAGLINE_MS);
+      await typeInto(taglineText, 'READ A BOOK. TAKE YOUR TIME BACK.', TAGLINE_MS);
       await sleep(900);
       taglineCursor.style.display = 'none';
       await sleep(300);
